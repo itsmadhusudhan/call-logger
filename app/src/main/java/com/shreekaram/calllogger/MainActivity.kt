@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
@@ -50,6 +51,7 @@ class MainActivity : ComponentActivity() {
         Manifest.permission.READ_EXTERNAL_STORAGE,
         Manifest.permission.WRITE_EXTERNAL_STORAGE,
         Manifest.permission.READ_PHONE_STATE,
+        Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE,
     )
 
     private fun requestPermissions() {
@@ -133,13 +135,18 @@ class MainActivity : ComponentActivity() {
                 Manifest.permission.READ_CALL_LOG
             ) == PackageManager.PERMISSION_GRANTED
         ) {
+            WorkManager.getInstance(applicationContext).cancelAllWork()
             val constraints = Constraints.Builder()
                 .build()
 
             val workRequest = PeriodicWorkRequestBuilder<CallLogWorker>(15, TimeUnit.MINUTES)
                 .setConstraints(constraints)
                 .build()
-            WorkManager.getInstance(applicationContext).enqueue(workRequest)
+            WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
+                "call_log_worker",
+                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+                workRequest
+            )
         }
 
 

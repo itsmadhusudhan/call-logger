@@ -1,8 +1,6 @@
 package com.shreekaram.calllogger
 
 import android.Manifest
-import android.app.Notification
-import android.app.NotificationManager
 import android.content.ContentValues
 import android.content.Context
 import android.content.pm.PackageManager
@@ -18,7 +16,6 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import java.io.File
 import java.io.OutputStream
-import kotlin.streams.asSequence
 
 class CallLogWorker(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
     override fun doWork(): Result {
@@ -53,7 +50,7 @@ class CallLogWorker(context: Context, workerParams: WorkerParameters) : Worker(c
                 val phoneNumber = it.getString(number)
                 val callType = it.getString(type)
 
-                var callDate = it.getString(date)
+                val callDate = it.getString(date)
                 //convert date to human readable format
 //                                    callDate = DateUtils.formatDateTime(
 //                                        applicationContext,
@@ -76,11 +73,9 @@ class CallLogWorker(context: Context, workerParams: WorkerParameters) : Worker(c
 
         }
         cursor?.close()
-        println(callRecords)
-
         // store the call records into file
         // human readable date format with file name
-       val time= DateUtils.formatDateTime(
+       val time = DateUtils.formatDateTime(
             applicationContext,
             System.currentTimeMillis(),
             DateUtils.FORMAT_SHOW_TIME
@@ -103,11 +98,9 @@ class CallLogWorker(context: Context, workerParams: WorkerParameters) : Worker(c
             uri?.let {
                 val outputStream: OutputStream? = resolver.openOutputStream(it)
                 outputStream?.bufferedWriter()?.use { it.write(content) }
-//                                    close stream
+            //  close stream
                 outputStream?.close()
             }
-
-
         } else {
             val downloadsDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
             val file = File(downloadsDirectory, fileName)
