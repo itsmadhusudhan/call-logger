@@ -4,9 +4,12 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyCallback
 import android.telephony.TelephonyManager
@@ -37,6 +40,9 @@ data class CallRecord(
     val duration: String
 )
 
+val OVERLAY_PERMISSION_REQ_CODE = 1245
+
+
 class MainActivity : ComponentActivity() {
     private val permissions = arrayOf(
         Manifest.permission.READ_CALL_LOG,
@@ -48,6 +54,7 @@ class MainActivity : ComponentActivity() {
         Manifest.permission.WRITE_EXTERNAL_STORAGE,
         Manifest.permission.READ_PHONE_STATE,
         Manifest.permission.BIND_NOTIFICATION_LISTENER_SERVICE,
+        Manifest.permission.SYSTEM_ALERT_WINDOW,
     )
 
     private fun requestPermissions() {
@@ -140,7 +147,7 @@ class MainActivity : ComponentActivity() {
             val constraints = Constraints.Builder()
                 .build()
 
-            val workRequest = PeriodicWorkRequestBuilder<CallLogWorker>(15, TimeUnit.MINUTES)
+            val workRequest = PeriodicWorkRequestBuilder<CallLogWorker>(1, TimeUnit.DAYS)
                 .setConstraints(constraints)
                 .build()
             WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
@@ -160,6 +167,12 @@ class MainActivity : ComponentActivity() {
         requestPermissions()
         scheduleCallLogWorker()
         listenToPhoneStateChanges()
+
+        if (!Settings.canDrawOverlays(this)) {
+            val intent =
+                Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
+            startActivity(intent)
+        }
 
         setContent {
             CallLoggerTheme {
