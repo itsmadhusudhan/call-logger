@@ -22,6 +22,7 @@ public class IncomingCallActivity extends Activity {
                     WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
             Log.d("IncomingCallActivity: onCreate: ", "flagy");
             setContentView(R.layout.activity_incoming_call);
+            this.setFinishOnTouchOutside(false);
             Log.d("IncomingCallActivity: onCreate: ", "flagz");
             String number = getIntent().getStringExtra("incomingNumber");
             @SuppressLint({"MissingInflatedId", "LocalSuppress"})

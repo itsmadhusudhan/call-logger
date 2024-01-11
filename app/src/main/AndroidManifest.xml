@@ -44,7 +44,12 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".IncomingCallActivity" />
+        <activity
+            android:name=".IncomingCallActivity"
+            android:launchMode="singleInstance"
+            android:theme="@android:style/Theme.Holo.Dialog"
+            android:excludeFromRecents="true"
+            />
 
         <service
             android:name=".AppNotificationService"
